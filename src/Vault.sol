@@ -26,6 +26,7 @@ contract Vault {
      * @param shares amount of shares
      */
     function mint(address to, uint256 shares) internal {
+        require(shares > 0);
         totalSupply += shares;
         balanceOf[to] += shares;
     }
@@ -36,11 +37,27 @@ contract Vault {
      * @param shares amount of shares to burn from
      */
     function burn(address from, uint shares) internal {
+        require(shares > 0);
         totalSupply -= shares;
         balanceOf[from] -= shares;
     }
 
+    function convertShares(
+        uint256 amount
+    ) private view returns (uint256 shares) {
+        shares = (amount * totalSupply) / token.balanceOf(address(this));
+        return shares;
+    }
+
+    function convertAssets(
+        uint256 shares
+    ) private view returns (uint256 amountAssets) {
+        amountAssets = (shares * token.balanceOf(address(this))) / totalSupply;
+        return amountAssets;
+    }
+
     function Deposit(uint256 amount) public {
+        require(amount > 0);
         /*
         a = amount
         B = balance of token before deposit
@@ -52,24 +69,16 @@ contract Vault {
         s = aT / B
         */
         uint256 shares;
-        shares = (amount * totalSupply) / token.balanceOf(address(this));
+        shares = convertShares(amount);
         mint(msg.sender, shares);
         token.transferFrom(msg.sender, address(this), amount);
     }
 
     function Withdraw(uint256 shares) public returns (uint256) {
-        /*
-        a = amount
-        B = balance of token before withdraw
-        T = total supply
-        s = shares to burn
+        require(shares > 0);
+        require(shares <= balanceOf[msg.sender]);
 
-        (T - s) / T = (B - a) / B 
-
-        a = sB / T
-        */
-        uint256 amount = (shares * token.balanceOf(address(this))) /
-            totalSupply;
+        uint256 amount = convertAssets(shares);
 
         burn(msg.sender, amount);
         token.transferFrom(address(this), msg.sender, amount);
