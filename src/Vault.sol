@@ -2,11 +2,16 @@
 pragma solidity 0.8.20;
 
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
+import {Math} from "../lib/Math.sol";
+
+//logic-amount of tokens sent-calc shares to minted upon amount sent-shares minted to user-totalsupplyincreases
 
 // Amount/Assets/AmountAssets all refer to the amount of the tokens used in making txns in this vault
 // whenever we want real to deposit or withdraw it is in this currency// i don't know why i find this hard to assimilate
 
 contract Vault {
+    using Math for uint256;
+
     event DepositAsset(address user, uint256 amountAssets);
     event WithdrawAsset(address user, uint256 amountAsset);
     event Minted(address to, uint256 amount);
@@ -69,7 +74,12 @@ contract Vault {
         s = aT / B
         */
         amount = amount * 1e8;
-        shares = (amount * totalSupply) / token.balanceOf(address(this));
+        // shares = (amount * totalSupply) / token.balanceOf(address(this));
+        shares = Math.mulDiv(
+            amount,
+            totalSupply,
+            token.balanceOf(address(this))
+        );
         shares = shares / 1e8;
         return shares;
     }
@@ -91,9 +101,15 @@ contract Vault {
 
         a = sB / T
         */
-        amountAssets =
-            ((shares * token.balanceOf(address(this))) * 1e8) /
-            totalSupply;
+        // amountAssets =
+        //     ((shares * token.balanceOf(address(this))) * 1e8) /
+        //     totalSupply;
+        amountAssets = Math.mulDiv(
+            shares,
+            token.balanceOf(address(this)) * 1e8,
+            totalSupply,
+            Math.Rounding.Ceil
+        );
         return amountAssets / 1e8;
     }
 
