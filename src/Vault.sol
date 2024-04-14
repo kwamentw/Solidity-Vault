@@ -3,6 +3,7 @@ pragma solidity 0.8.20;
 
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {Math} from "../lib/Math.sol";
+import {AggregatorV3Interface} from "../lib/chainlink-brownie-contracts/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 //logic-amount of tokens sent-calc shares to minted upon amount sent-shares minted to user-totalsupplyincreases
 
@@ -30,6 +31,14 @@ contract Vault {
         //there should always be an initial deposit before using this contract
         uint256 initialSupply = 10000;
         totalSupply = initialSupply;
+    }
+
+    function getPrice() internal view returns (uint256) {
+        AggregatorV3Interface pricefeed = AggregatorV3Interface(
+            0x14866185B1962B63C3Ea9E03Bc1da838bab34C19
+        );
+        (, int price, , , ) = pricefeed.latestRoundData();
+        return uint256(price);
     }
 
     /**
