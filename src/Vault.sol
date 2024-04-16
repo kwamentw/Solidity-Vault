@@ -21,7 +21,7 @@ contract Vault {
     IERC20 immutable token;
 
     // total number of vault tokens minted
-    uint256 totalSupply;
+    uint256 private totalSupply;
     // balance of addresses that got vault tokens
     mapping(address => uint256) balanceOf;
 
@@ -36,11 +36,9 @@ contract Vault {
     /**
      * This is a function to get the price(USD equivalent) of the underlying asset
      */
-    function getPrice() public view returns (uint256) {
+    function getPrice(address _token) public view returns (uint256) {
         // if we are going to use DAI, the decimal precision is 18
-        AggregatorV3Interface pricefeed = AggregatorV3Interface(
-            0x14866185B1962B63C3Ea9E03Bc1da838bab34C19
-        );
+        AggregatorV3Interface pricefeed = AggregatorV3Interface(_token);
         (, int price, , , ) = pricefeed.latestRoundData();
         return uint256(price);
     }
@@ -154,5 +152,13 @@ contract Vault {
         token.transferFrom(address(this), msg.sender, amount);
         //returns amount burnt or sent to receiver
         return amount;
+    }
+
+    function getTotalSupply() external view returns (uint256) {
+        return totalSupply;
+    }
+
+    function getBalanceOf(address account) external view returns (uint256) {
+        return balanceOf[account];
     }
 }
