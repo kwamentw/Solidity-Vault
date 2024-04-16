@@ -36,7 +36,7 @@ contract Vault {
     /**
      * This is a function to get the price(USD equivalent) of the underlying asset
      */
-    function getPrice() internal view returns (uint256) {
+    function getPrice() public view returns (uint256) {
         // if we are going to use DAI, the decimal precision is 18
         AggregatorV3Interface pricefeed = AggregatorV3Interface(
             0x14866185B1962B63C3Ea9E03Bc1da838bab34C19
