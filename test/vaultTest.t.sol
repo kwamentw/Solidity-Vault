@@ -33,8 +33,8 @@ contract VaultTest is Test {
         uint256 beforeBal = vault.getBalanceOf(msg.sender);
         uint256 prevToSupp = vault.getTotalSupply();
 
-        deal(address(vault), 99e9);
-        vault.Deposit(55);
+        hoax(address(this), 99e9);
+        vault.Deposit(55e8);
 
         uint256 afterBal = vault.getBalanceOf(msg.sender);
         uint256 afterToSupp = vault.getTotalSupply();

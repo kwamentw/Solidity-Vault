@@ -48,7 +48,7 @@ contract Vault {
      * @param to address receiving minted shares
      * @param shares amount of shares
      */
-    function mint(address to, uint256 shares) internal {
+    function _mint(address to, uint256 shares) internal {
         require(shares > 0);
         emit Minted(to, shares);
         totalSupply += shares;
@@ -60,7 +60,7 @@ contract Vault {
      * @param from address to burn shares from
      * @param shares amount of shares to burn from
      */
-    function burn(address from, uint shares) internal {
+    function _burn(address from, uint shares) internal {
         require(shares > 0);
         emit Burned(from, shares);
         totalSupply -= shares;
@@ -133,7 +133,7 @@ contract Vault {
         uint256 shares;
         shares = convertShares(amount);
         emit DepositAsset(msg.sender, amount);
-        mint(msg.sender, shares);
+        _mint(msg.sender, shares);
         token.transferFrom(msg.sender, address(this), amount);
     }
 
@@ -148,7 +148,7 @@ contract Vault {
         amount = convertAssets(shares);
 
         emit WithdrawAsset(msg.sender, shares);
-        burn(msg.sender, amount);
+        _burn(msg.sender, amount);
         token.transferFrom(address(this), msg.sender, amount);
         //returns amount burnt or sent to receiver
         return amount;
