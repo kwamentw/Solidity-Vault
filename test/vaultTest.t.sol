@@ -2,46 +2,59 @@
 pragma solidity 0.8.20;
 
 import {Test, console2} from "forge-std/Test.sol";
-import {Vault} from "../src/Vault.sol";
-import {Math} from "../lib/Math.sol";
+import {Vault2} from "../src/Vault.sol";
+import {FourbToken} from "../src/ERC20.sol";
 
 contract VaultTest is Test {
-    Vault vault;
+    Vault2 public vault;
+    FourbToken token;
+    address userOne = makeAddr("firstuser");
 
     function setUp() public {
-        // deploy with DAi for now
-        vault = new Vault(0x14866185B1962B63C3Ea9E03Bc1da838bab34C19);
+        token = new FourbToken("BBBBTOKEN", "4BTKN", 8, 120e8);
+        // deployed with custom token
+        vault = new Vault2(address(token), 1e8);
+        // this contract is supposed to be deployed with stake holders deposit to moderate the vault
+        vm.prank(address(vault));
+        token.mint(1e8);
+
+        address userTwo = makeAddr("secondUSER");
+        vm.startPrank(userTwo);
+        token.mint(30e7);
+        token.approve(15e7, address(vault));
+        vm.stopPrank();
     }
 
-    /**
-     * Testing whether the price feed is working
-     */
-    function testPriceFeedDAI() public {
-        address token = 0x14866185B1962B63C3Ea9E03Bc1da838bab34C19;
-        uint256 currentPrice = vault.getPrice(token);
-        uint256 defaultPrice;
-        assertGt(currentPrice, defaultPrice);
+    function test_vaultDeposit() public {
+        vm.startPrank(msg.sender);
+        token.mint(10e8);
+        token.approve(7e8, 0x2e234DAe75C793f67A35089C9d99245E1C58470b);
         console2.log(
-            "Current price of DAI is ",
-            // every ETH pair has 18 decimals and non eth pairs have 8
-            Math.ceilDiv(currentPrice, 1e8)
+            "Allowance: ",
+            token.Allowance(
+                msg.sender,
+                0x2e234DAe75C793f67A35089C9d99245E1C58470b
+            )
         );
-    }
+        vault.deposit(5e8);
+        console2.log(
+            "Allowance: ",
+            token.Allowance(
+                msg.sender,
+                0x2e234DAe75C793f67A35089C9d99245E1C58470b
+            )
+        );
+        console2.log("msg.sender balance", token.balanceOf(msg.sender));
+        // console2.log("userOne balance is ", token.balanceOf(userOne));
+        // console2.log(address(msg.sender));
+        // console2.log(address(userOne));
+        // console2.log(address(this));
+        // console2.log(address(vault));
+        // console2.log(address(token));
 
-    function testDepositVault() public {
-        // before deposit
-        uint256 beforeBal = vault.getBalanceOf(msg.sender);
-        uint256 prevToSupp = vault.getTotalSupply();
+        vm.stopPrank();
 
-        hoax(address(this), 99e9);
-        vault.Deposit(55e8);
-
-        uint256 afterBal = vault.getBalanceOf(msg.sender);
-        uint256 afterToSupp = vault.getTotalSupply();
-
-        console2.log("Before----");
-        console2.log(beforeBal, prevToSupp);
-        console2.log("After--------");
-        console2.log(afterBal, afterToSupp);
+        assertEq(token.balanceOf(msg.sender), 5e8);
+        assertGt(vault.balanceOf(msg.sender), 0);
     }
 }
