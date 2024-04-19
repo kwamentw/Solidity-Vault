@@ -45,6 +45,7 @@ contract VaultTest is Test {
             )
         );
         console2.log("msg.sender balance", token.balanceOf(msg.sender));
+        console2.log("vault balance of user is ", vault.balanceOf(msg.sender));
         // console2.log("userOne balance is ", token.balanceOf(userOne));
         // console2.log(address(msg.sender));
         // console2.log(address(userOne));
@@ -56,5 +57,21 @@ contract VaultTest is Test {
 
         assertEq(token.balanceOf(msg.sender), 5e8);
         assertGt(vault.balanceOf(msg.sender), 0);
+    }
+
+    function test_vaultWithdraw() public {
+        test_vaultDeposit();
+
+        vm.startPrank(msg.sender);
+
+        vault.withdraw(5e8);
+
+        console2.log("your balance is ", token.balanceOf(msg.sender));
+        console2.log("Your vault bal is ", vault.balanceOf(msg.sender));
+
+        vm.stopPrank();
+
+        assertEq(token.balanceOf(msg.sender), 10e8);
+        assertEq(vault.balanceOf(msg.sender), 0);
     }
 }

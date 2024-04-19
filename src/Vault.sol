@@ -203,7 +203,7 @@ contract Vault2 {
         uint256 amount = (shares * token.balanceOf(address(this))) /
             totalSupply;
         _burn(msg.sender, shares);
-        token.transfer(msg.sender, amount);
+        token.TransferToken(msg.sender, amount);
     }
 }
 
@@ -212,7 +212,7 @@ interface IERC20 {
 
     function balanceOf(address account) external view returns (uint256);
 
-    function transfer(
+    function TransferToken(
         address recipient,
         uint256 amount
     ) external returns (bool);
