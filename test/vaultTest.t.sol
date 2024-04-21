@@ -25,6 +25,8 @@ contract VaultTest1 is Test {
         vm.prank(address(vault1));
         token.mint(10e6);
     }
+
+    function test_vault1Deposit() public {}
 }
 
 /**
