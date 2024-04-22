@@ -5,7 +5,7 @@ pragma solidity 0.8.20;
 //--------vault 1-----------------//
 ////////////////////////////////////
 
-import {IERC20} from "forge-std/interfaces/IERC20.sol";
+import {IERC20} from "./interface/IERC20.sol";
 import {Math} from "../lib/Math.sol";
 import {AggregatorV3Interface} from "../lib/chainlink-brownie-contracts/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
@@ -27,13 +27,12 @@ contract Vault {
     // total number of vault tokens minted
     uint256 private totalSupply;
     // balance of addresses that got vault tokens
-    mapping(address => uint256) balanceOf;
+    mapping(address => uint256) public balanceOf;
 
-    constructor(address _token) {
+    constructor(address _token, uint256 initialSupply) {
         // initializing the token we want to use as vault tokens
         token = IERC20(_token);
         //there should always be an initial deposit before using this contract
-        uint256 initialSupply = 10000;
         totalSupply = initialSupply;
     }
 
@@ -53,8 +52,8 @@ contract Vault {
      * @param shares amount of shares
      */
     function _mint(address to, uint256 shares) internal {
-        require(shares > 0);
         emit Minted(to, shares);
+        require(shares > 0, "revert shares");
         totalSupply += shares;
         balanceOf[to] += shares;
     }
@@ -88,14 +87,12 @@ contract Vault {
 
         s = aT / B
         */
-        amount = amount * 1e8;
         // shares = (amount * totalSupply) / token.balanceOf(address(this));
         shares = Math.mulDiv(
             amount,
             totalSupply,
             token.balanceOf(address(this))
         );
-        shares = shares / 1e8;
         return shares;
     }
 
@@ -133,12 +130,12 @@ contract Vault {
      * @param amount amount of tokens you want to deposit in the vault
      */
     function Deposit(uint256 amount) public {
-        require(amount > 0);
+        require(amount > 0, "revert1");
         uint256 shares;
         shares = convertShares(amount);
         emit DepositAsset(msg.sender, amount);
         _mint(msg.sender, shares);
-        token.transferFrom(msg.sender, address(this), amount);
+        token.transferfrom(msg.sender, address(this), amount);
     }
 
     /**
@@ -153,7 +150,7 @@ contract Vault {
 
         emit WithdrawAsset(msg.sender, shares);
         _burn(msg.sender, amount);
-        token.transferFrom(address(this), msg.sender, amount);
+        token.transferfrom(address(this), msg.sender, amount);
         //returns amount burnt or sent to receiver
         return amount;
     }
