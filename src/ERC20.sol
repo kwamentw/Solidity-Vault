@@ -116,7 +116,6 @@ contract FourbToken {
      */
     function mint(uint256 amount) external returns (bool) {
         require(amount != 0, "invalid amount");
-        require(amount < totalSupply);
         balanceOf[msg.sender] += amount;
         totalSupply += amount;
         emit Transfer(address(0), msg.sender, amount);

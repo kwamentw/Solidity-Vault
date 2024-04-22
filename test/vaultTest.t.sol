@@ -26,7 +26,17 @@ contract VaultTest1 is Test {
         token.mint(10e6);
     }
 
-    function test_vault1Deposit() public {}
+    function test_vault1Deposit() public {
+        //--------(1st Depositor)----------//
+        vm.prank(msg.sender);
+        token.mint(10e6);
+
+        token.approve(7e6, 0x2e234DAe75C793f67A35089C9d99245E1C58470b);
+        vault1.Deposit(6e6);
+
+        assertEq(token.balanceOf(msg.sender), 4e6);
+        assertEq(vault1.getBalanceOf(msg.sender), 6e6);
+    }
 }
 
 /**
