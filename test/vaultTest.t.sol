@@ -40,6 +40,30 @@ contract VaultTest1 is Test {
         console2.log("vault balance", vault1.balanceOf(msg.sender));
         console2.log("total shares", vault1.getTotalSupply());
         vm.stopPrank();
+
+        //---------(2nd Depositor)--------//
+        vm.startPrank(firstUser);
+        token.mint(20e6);
+
+        token.approve(17e6, 0x2e234DAe75C793f67A35089C9d99245E1C58470b);
+        vault1.Deposit(17e6);
+
+        console2.log("token balance:", token.balanceOf(firstUser));
+        console2.log("vault balance:", vault1.balanceOf(firstUser));
+        console2.log("total shares:", vault1.getTotalSupply());
+        vm.stopPrank();
+
+        //------------(Srd depositor)-------------//
+        vm.startPrank(secondUser);
+        token.mint(111e6);
+
+        token.approve(100e6, 0x2e234DAe75C793f67A35089C9d99245E1C58470b);
+        vault1.Deposit(100e6);
+
+        console2.log("token balance: ", token.balanceOf(secondUser));
+        console2.log("vault balance: ", vault1.balanceOf(secondUser));
+        console2.log("total shares: ", vault1.getTotalSupply());
+        vm.stopPrank();
     }
 }
 
