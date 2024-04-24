@@ -4,269 +4,183 @@ pragma solidity 0.8.20;
 // import statements
 import {Test, console2} from "forge-std/Test.sol";
 // import {Vault2} from "../src/Vault.sol";
-import {Vault} from "../src/Vault.sol";
+import {Vault2} from "../src/Vault.sol";
 import {FourbToken} from "../src/ERC20.sol";
-
-contract VaultTest1 is Test {
-    // vault1 initialisation
-    Vault vault1;
-
-    //underlying token
-    FourbToken token;
-
-    // Depositiors Address
-    address firstUser = makeAddr("FIRSTUSER");
-    address secondUser = makeAddr("SECONDUSER");
-
-    function setUp() public {
-        // initialising underlying token
-        token = new FourbToken("FBTKN", "BBBBTKN", 6, 10);
-        // initialising vault in use
-        vault1 = new Vault(address(token), 40e6);
-
-        // minting some tokens to the vault to prevent vault inflation attacks
-        vm.prank(address(vault1));
-        token.mint(40e6);
-    }
-
-    /**
-     * A test to check whether deposit in vault1 is working well
-     */
-    function test_vault1Deposit() public {
-        //--------(1st Depositor)----------//
-        vm.startPrank(msg.sender);
-        token.mint(10e6);
-
-        // approving vault
-        token.approve(7e6, 0x2e234DAe75C793f67A35089C9d99245E1C58470b);
-        // *** Depositing***
-        vault1.Deposit(6e6);
-
-        assertEq(token.balanceOf(msg.sender), 4e6);
-        assertEq(vault1.getBalanceOf(msg.sender), 6e6);
-
-        console2.log("token balance:", token.balanceOf(msg.sender));
-        console2.log("vault balance", vault1.balanceOf(msg.sender));
-        console2.log("total shares", vault1.getTotalSupply());
-
-        vm.stopPrank();
-
-        //---------(2nd Depositor)--------//
-        vm.startPrank(firstUser);
-        // minting some tokens to user so he can perform deposit
-        token.mint(20e6);
-
-        // approving vault
-        token.approve(17e6, 0x2e234DAe75C793f67A35089C9d99245E1C58470b);
-        // *** Depositing ***
-        vault1.Deposit(17e6);
-
-        assertEq(token.balanceOf(firstUser), 3e6);
-        assertEq(vault1.getBalanceOf(firstUser), 17e6);
-
-        console2.log("token balance:", token.balanceOf(firstUser));
-        console2.log("vault balance:", vault1.balanceOf(firstUser));
-        console2.log("total shares:", vault1.getTotalSupply());
-
-        vm.stopPrank();
-
-        //------------(Srd depositor)-------------//
-        vm.startPrank(secondUser);
-        // minting some tokens to user so he can perform deposit
-        token.mint(111e6);
-
-        // approving vault
-        token.approve(100e6, 0x2e234DAe75C793f67A35089C9d99245E1C58470b);
-        // *** Depositing ***
-        vault1.Deposit(100e6);
-
-        assertEq(token.balanceOf(secondUser), 11e6);
-        assertEq(vault1.getBalanceOf(secondUser), 100e6);
-
-        console2.log("token balance: ", token.balanceOf(secondUser));
-        console2.log("vault balance: ", vault1.balanceOf(secondUser));
-        console2.log("total shares: ", vault1.getTotalSupply());
-
-        vm.stopPrank();
-    }
-
-    function test_withdrawVault1() public {}
-}
 
 /**
  * @title Vaut2 Test
  * @author Kwame4b
  * @notice not advised to deploy this
  */
-// contract VaultTest is Test {
-//     // vault 2
-//     Vault2 public vault;
-//     // underlying token of vault
-//     FourbToken token;
+contract VaultTest is Test {
+    // vault 2
+    Vault2 public vault;
+    // underlying token of vault
+    FourbToken token;
 
-//     // depositors address
-//     address userOne = makeAddr("firstuser");
-//     address userTwo = makeAddr("secondUSER");
+    // depositors address
+    address userOne = makeAddr("firstuser");
+    address userTwo = makeAddr("secondUSER");
 
-//     function setUp() public {
-//         // custom token declaration
-//         token = new FourbToken("BBBBTOKEN", "4BTKN", 8, 120);
-//         // deployed with custom token
-//         vault = new Vault2(address(token), 1e8);
-//         // this contract is supposed to be deployed with stake holders deposit to moderate the vault
-//         vm.prank(address(vault));
-//         token.mint(1e8);
-//     }
+    function setUp() public {
+        // custom token declaration
+        token = new FourbToken("BBBBTOKEN", "4BTKN", 8, 120);
+        // deployed with custom token
+        vault = new Vault2(address(token), 1e8);
+        // this contract is supposed to be deployed with stake holders deposit to moderate the vault
+        vm.prank(address(vault));
+        token.mint(1e8);
+    }
 
-//     /**
-//      * A test to check whether deposit is working properly
-//      */
-//     function test_vaultDeposit() public {
-//         //---------1st Depositor(Foundry default sender)--------//
-//         vm.startPrank(msg.sender);
+    /**
+     * A test to check whether deposit is working properly
+     */
+    function test_vaultDeposit() public {
+        //---------1st Depositor(Foundry default sender)--------//
+        vm.startPrank(msg.sender);
 
-//         token.mint(10e8);
-//         // approving vault to spend tokens
-//         token.approve(7e8, 0x2e234DAe75C793f67A35089C9d99245E1C58470b);
+        token.mint(10e8);
+        // approving vault to spend tokens
+        token.approve(7e8, 0x2e234DAe75C793f67A35089C9d99245E1C58470b);
 
-//         // checking vault balance before deposit
-//         console2.log(
-//             "Allowance: ",
-//             token.Allowance(
-//                 msg.sender,
-//                 0x2e234DAe75C793f67A35089C9d99245E1C58470b
-//             )
-//         );
-//         // ***depositing***
-//         vault.deposit(5e8);
+        // checking vault balance before deposit
+        console2.log(
+            "Allowance: ",
+            token.Allowance(
+                msg.sender,
+                0x2e234DAe75C793f67A35089C9d99245E1C58470b
+            )
+        );
+        // ***depositing***
+        vault.deposit(5e8);
 
-//         // checking vault balance after deposit
-//         console2.log(
-//             "Allowance after deposit: ",
-//             token.Allowance(
-//                 msg.sender,
-//                 0x2e234DAe75C793f67A35089C9d99245E1C58470b
-//             )
-//         );
+        // checking vault balance after deposit
+        console2.log(
+            "Allowance after deposit: ",
+            token.Allowance(
+                msg.sender,
+                0x2e234DAe75C793f67A35089C9d99245E1C58470b
+            )
+        );
 
-//         // printing user balance & vault balance to see if deposit was effective.
-//         console2.log("msg.sender balance", token.balanceOf(msg.sender));
-//         console2.log("vault balance of user is ", vault.balanceOf(msg.sender));
+        // printing user balance & vault balance to see if deposit was effective.
+        console2.log("msg.sender balance", token.balanceOf(msg.sender));
+        console2.log("vault balance of user is ", vault.balanceOf(msg.sender));
 
-//         // was just trying to know what these addresses are for curiousity and an error probe
-//         // console2.log("userOne balance is ", token.balanceOf(userOne));
-//         // console2.log(address(msg.sender));
-//         // console2.log(address(userOne));
-//         // console2.log(address(this));
-//         // console2.log(address(vault));
-//         // console2.log(address(token));
+        // was just trying to know what these addresses are for curiousity and an error probe
+        // console2.log("userOne balance is ", token.balanceOf(userOne));
+        // console2.log(address(msg.sender));
+        // console2.log(address(userOne));
+        // console2.log(address(this));
+        // console2.log(address(vault));
+        // console2.log(address(token));
 
-//         // Checking to see whether deposit affected respective accounts
-//         assertEq(token.balanceOf(msg.sender), 5e8);
-//         assertGt(vault.balanceOf(msg.sender), 0);
+        // Checking to see whether deposit affected respective accounts
+        assertEq(token.balanceOf(msg.sender), 5e8);
+        assertGt(vault.balanceOf(msg.sender), 0);
 
-//         vm.stopPrank();
+        vm.stopPrank();
 
-//         //***********2nd Depositor(userOne)*********** */
-//         vm.startPrank(userOne);
+        //***********2nd Depositor(userOne)*********** */
+        vm.startPrank(userOne);
 
-//         token.mint(20e8);
-//         // approving vault to spend tokens
-//         token.approve(15e8, 0x2e234DAe75C793f67A35089C9d99245E1C58470b);
+        token.mint(20e8);
+        // approving vault to spend tokens
+        token.approve(15e8, 0x2e234DAe75C793f67A35089C9d99245E1C58470b);
 
-//         //  allowance before deposit
-//         console2.log(
-//             "2nd Allowance  is: ",
-//             token.Allowance(userOne, 0x2e234DAe75C793f67A35089C9d99245E1C58470b)
-//         );
-//         //*****depositing*****//
-//         vault.deposit(13e8);
+        //  allowance before deposit
+        console2.log(
+            "2nd Allowance  is: ",
+            token.Allowance(userOne, 0x2e234DAe75C793f67A35089C9d99245E1C58470b)
+        );
+        //*****depositing*****//
+        vault.deposit(13e8);
 
-//         //  allowance after deposit
-//         console2.log(
-//             "2nd Allowance after deposit is: ",
-//             token.Allowance(userOne, 0x2e234DAe75C793f67A35089C9d99245E1C58470b)
-//         );
+        //  allowance after deposit
+        console2.log(
+            "2nd Allowance after deposit is: ",
+            token.Allowance(userOne, 0x2e234DAe75C793f67A35089C9d99245E1C58470b)
+        );
 
-//         // checking to see if respective balances effected deposit
-//         assertEq(token.balanceOf(userOne), 7e8);
-//         assertEq(vault.balanceOf(userOne), 13e8);
+        // checking to see if respective balances effected deposit
+        assertEq(token.balanceOf(userOne), 7e8);
+        assertEq(vault.balanceOf(userOne), 13e8);
 
-//         vm.stopPrank();
+        vm.stopPrank();
 
-//         ///////////////// 3rd Depostor(userTwo) //////////////////
-//         vm.startPrank(userTwo);
-//         token.mint(100e8);
-//         // approving vault
-//         token.approve(80e8, 0x2e234DAe75C793f67A35089C9d99245E1C58470b);
-//         // allowance before deposit
-//         console2.log(
-//             "3rd allowance is ",
-//             token.Allowance(userTwo, 0x2e234DAe75C793f67A35089C9d99245E1C58470b)
-//         );
-//         vault.deposit(75e8);
-//         // allowance after deposit
-//         console2.log(
-//             "3rd allowance after deposit is ",
-//             token.Allowance(userTwo, 0x2e234DAe75C793f67A35089C9d99245E1C58470b)
-//         );
+        ///////////////// 3rd Depostor(userTwo) //////////////////
+        vm.startPrank(userTwo);
+        token.mint(100e8);
+        // approving vault
+        token.approve(80e8, 0x2e234DAe75C793f67A35089C9d99245E1C58470b);
+        // allowance before deposit
+        console2.log(
+            "3rd allowance is ",
+            token.Allowance(userTwo, 0x2e234DAe75C793f67A35089C9d99245E1C58470b)
+        );
+        vault.deposit(75e8);
+        // allowance after deposit
+        console2.log(
+            "3rd allowance after deposit is ",
+            token.Allowance(userTwo, 0x2e234DAe75C793f67A35089C9d99245E1C58470b)
+        );
 
-//         // checking whether respective balances have effected deposit
-//         assertEq(token.balanceOf(userTwo), 25e8);
-//         assertEq(vault.balanceOf(userTwo), 75e8);
+        // checking whether respective balances have effected deposit
+        assertEq(token.balanceOf(userTwo), 25e8);
+        assertEq(vault.balanceOf(userTwo), 75e8);
 
-//         vm.stopPrank();
+        vm.stopPrank();
 
-//         // checking balances of token and vault after all deposits
-//         console2.log("Total supply is :", token.totalSupply());
-//         console2.log("Total vault tokens is: ", vault.totalSupply());
-//     }
+        // checking balances of token and vault after all deposits
+        console2.log("Total supply is :", token.totalSupply());
+        console2.log("Total vault tokens is: ", vault.totalSupply());
+    }
 
-//     /**
-//      * A test to check whether withdrawal is working
-//      */
-//     function test_vaultWithdraw() public {
-//         // Users depositing funds
-//         test_vaultDeposit();
+    /**
+     * A test to check whether withdrawal is working
+     */
+    function test_vaultWithdraw() public {
+        // Users depositing funds
+        test_vaultDeposit();
 
-//         //-------1st withdrawal(foundry default sender)-------//
-//         vm.startPrank(msg.sender);
+        //-------1st withdrawal(foundry default sender)-------//
+        vm.startPrank(msg.sender);
 
-//         // ...withdrawing
-//         vault.withdraw(5e8);
+        // ...withdrawing
+        vault.withdraw(5e8);
 
-//         // balance after withdrawal
-//         console2.log("your balance is ", token.balanceOf(msg.sender));
-//         console2.log("Your vault bal is ", vault.balanceOf(msg.sender));
+        // balance after withdrawal
+        console2.log("your balance is ", token.balanceOf(msg.sender));
+        console2.log("Your vault bal is ", vault.balanceOf(msg.sender));
 
-//         // checking to see whether withdrawal affected respective balances
-//         assertEq(token.balanceOf(msg.sender), 10e8);
-//         assertEq(vault.balanceOf(msg.sender), 0);
+        // checking to see whether withdrawal affected respective balances
+        assertEq(token.balanceOf(msg.sender), 10e8);
+        assertEq(vault.balanceOf(msg.sender), 0);
 
-//         vm.stopPrank();
+        vm.stopPrank();
 
-//         // total supply of tokens & vault total after first withdrawal
-//         console2.log("Total token supply is: ", token.totalSupply());
-//         console2.log("Total shares in vault is: ", vault.totalSupply());
+        // total supply of tokens & vault total after first withdrawal
+        console2.log("Total token supply is: ", token.totalSupply());
+        console2.log("Total shares in vault is: ", vault.totalSupply());
 
-//         //------------2nd Withdrawal(userTwo)------------//
-//         vm.startPrank(userTwo);
+        //------------2nd Withdrawal(userTwo)------------//
+        vm.startPrank(userTwo);
 
-//         // ...withdrawing
-//         vault.withdraw(50e8);
+        // ...withdrawing
+        vault.withdraw(50e8);
 
-//         // respective balances after withdrawal
-//         console2.log("your balance is: ", token.balanceOf(userTwo));
-//         console2.log("your vault balance is: ", vault.balanceOf(userTwo));
+        // respective balances after withdrawal
+        console2.log("your balance is: ", token.balanceOf(userTwo));
+        console2.log("your vault balance is: ", vault.balanceOf(userTwo));
 
-//         // Checking whether 2nd withdrawal effected
-//         assertEq(token.balanceOf(userTwo), 75e8);
-//         assertEq(vault.balanceOf(userTwo), 25e8);
+        // Checking whether 2nd withdrawal effected
+        assertEq(token.balanceOf(userTwo), 75e8);
+        assertEq(vault.balanceOf(userTwo), 25e8);
 
-//         vm.stopPrank();
+        vm.stopPrank();
 
-//         // Total tokens supply & vault balance after the second withdrawal
-//         console2.log("Total token supply is: ", token.totalSupply());
-//         console2.log(" vault balance is: ", vault.totalSupply());
-//     }
-// }
+        // Total tokens supply & vault balance after the second withdrawal
+        console2.log("Total token supply is: ", token.totalSupply());
+        console2.log(" vault balance is: ", vault.totalSupply());
+    }
+}

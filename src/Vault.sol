@@ -25,7 +25,7 @@ contract Vault {
     IERC20 immutable token;
 
     // total number of vault tokens minted
-    uint256 private totalSupply;
+    uint256 public totalSupply;
     // balance of addresses that got vault tokens
     mapping(address => uint256) public balanceOf;
 
@@ -102,7 +102,7 @@ contract Vault {
      */
     function convertAssets(
         uint256 shares
-    ) internal view returns (uint256 amountAssets) {
+    ) public view returns (uint256 amountAssets) {
         /*
         a = amount
         B = balance of token before withdraw
@@ -118,11 +118,11 @@ contract Vault {
         //     totalSupply;
         amountAssets = Math.mulDiv(
             shares,
-            token.balanceOf(address(this)) * 1e8,
+            token.balanceOf(address(this)),
             totalSupply,
             Math.Rounding.Ceil
         );
-        return amountAssets / 1e8;
+        return amountAssets;
     }
 
     /**
@@ -142,17 +142,15 @@ contract Vault {
      *  to withdraw you shares in the vault
      * @param shares number of shares you withdrawing
      */
-    function Withdraw(uint256 shares) public returns (uint256 amount) {
-        require(shares > 0);
-        require(shares <= balanceOf[msg.sender]);
+    function Withdraw(uint256 shares) external {
+        require(shares > 0, "withdraw error 1");
 
-        amount = convertAssets(shares);
+        uint256 amount = convertAssets(shares);
 
         emit WithdrawAsset(msg.sender, shares);
-        _burn(msg.sender, amount);
-        token.transferfrom(address(this), msg.sender, amount);
-        //returns amount burnt or sent to receiver
-        return amount;
+        _burn(msg.sender, shares);
+
+        token.TransferToken(msg.sender, amount);
     }
 
     function getTotalSupply() external view returns (uint256) {
@@ -164,73 +162,42 @@ contract Vault {
     }
 }
 
-//-----------vault 2---------------//
+// -----------vault 2---------------//
 
-// contract Vault2 {
-//     IERC20 public immutable token;
+contract Vault2 {
+    IERC20 public immutable token;
 
-//     // there should initial shares minted
-//     uint256 public totalSupply;
-//     mapping(address => uint256) public balanceOf;
+    // there should initial shares minted
+    uint256 public totalSupply;
+    mapping(address => uint256) public balanceOf;
 
-//     constructor(address _token, uint256 _initialdeposit) {
-//         token = IERC20(_token);
-//         // this is done by the owners of the vault to regulate minting
-//         totalSupply += _initialdeposit;
-//     }
+    constructor(address _token, uint256 _initialdeposit) {
+        token = IERC20(_token);
+        // this is done by the owners of the vault to regulate minting
+        totalSupply += _initialdeposit;
+    }
 
-//     function _mint(address _to, uint256 _shares) private {
-//         totalSupply += _shares;
-//         balanceOf[_to] += _shares;
-//     }
+    function _mint(address _to, uint256 _shares) private {
+        totalSupply += _shares;
+        balanceOf[_to] += _shares;
+    }
 
-//     function _burn(address _from, uint256 _shares) private {
-//         totalSupply -= _shares;
-//         balanceOf[_from] -= _shares;
-//     }
+    function _burn(address _from, uint256 _shares) private {
+        totalSupply -= _shares;
+        balanceOf[_from] -= _shares;
+    }
 
-//     function deposit(uint256 amount) external {
-//         uint256 shares = (amount * totalSupply) /
-//             token.balanceOf(address(this));
-//         _mint(msg.sender, shares);
-//         token.transferfrom(msg.sender, address(this), amount);
-//     }
+    function deposit(uint256 amount) external {
+        uint256 shares = (amount * totalSupply) /
+            token.balanceOf(address(this));
+        _mint(msg.sender, shares);
+        token.transferfrom(msg.sender, address(this), amount);
+    }
 
-//     function withdraw(uint256 shares) external {
-//         uint256 amount = (shares * token.balanceOf(address(this))) /
-//             totalSupply;
-//         _burn(msg.sender, shares);
-//         token.TransferToken(msg.sender, amount);
-//     }
-// }
-
-// interface IERC20 {
-//     function totalSupply() external view returns (uint256);
-
-//     function balanceOf(address account) external view returns (uint256);
-
-//     function TransferToken(
-//         address recipient,
-//         uint256 amount
-//     ) external returns (bool);
-
-//     function allowance(
-//         address owner,
-//         address spender
-//     ) external view returns (uint256);
-
-//     function approve(address spender, uint256 amount) external returns (bool);
-
-//     function transferfrom(
-//         address sender,
-//         address recipient,
-//         uint256 amount
-//     ) external returns (bool);
-
-//     event Transfer(address indexed from, address indexed to, uint256 amount);
-//     event Approval(
-//         address indexed owner,
-//         address indexed spender,
-//         uint256 amount
-//     );
-// }
+    function withdraw(uint256 shares) external {
+        uint256 amount = (shares * token.balanceOf(address(this))) /
+            totalSupply;
+        _burn(msg.sender, shares);
+        token.TransferToken(msg.sender, amount);
+    }
+}
