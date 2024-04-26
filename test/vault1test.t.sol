@@ -6,6 +6,7 @@ import {Test, console2} from "forge-std/Test.sol";
 // import {Vault2} from "../src/Vault.sol";
 import {Vault} from "../src/Vault.sol";
 import {FourbToken} from "../src/ERC20.sol";
+import {StdInvariant} from "forge-std/StdInvariant.sol";
 
 contract VaultTest1 is Test {
     // vault1 initialisation
@@ -123,6 +124,28 @@ contract VaultTest1 is Test {
 
         assertEq(token.balanceOf(firstUser), 19e6);
         assertEq(vault1.balanceOf(firstUser), 1e6);
+
+        vm.stopPrank();
+    }
+
+    /**
+     * Trying stateless fuzzing
+     * @param amount amount to fuzz
+     */
+    function testFuzz_Depositvault1(uint96 amount) public {
+        vm.assume(amount > 0 && amount <= 19e6);
+        vm.startPrank(firstUser);
+        // minting some tokens to user so he can perform deposit
+        token.mint(20e6);
+
+        // approving vault
+        token.approve(19e6, 0x2e234DAe75C793f67A35089C9d99245E1C58470b);
+        // *** Depositing ***
+        vault1.Deposit(amount);
+
+        console2.log("token balance:", token.balanceOf(firstUser));
+        console2.log("vault balance:", vault1.balanceOf(firstUser));
+        console2.log("total shares:", vault1.getTotalSupply());
 
         vm.stopPrank();
     }
