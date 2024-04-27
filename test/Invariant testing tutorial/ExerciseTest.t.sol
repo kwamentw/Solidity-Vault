@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-import {Exercise} from "../../src/tutorial/tutorial.sol";
+import {Exercise} from "../../src/tutorial Invariant testing/tutorial.sol";
 import {Test} from "forge-std/Test.sol";
 
 contract ExerciseTest is Test {
