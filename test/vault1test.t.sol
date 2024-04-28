@@ -7,7 +7,6 @@ import {Test, console2} from "forge-std/Test.sol";
 import {Vault} from "../src/Vault.sol";
 import {FourbToken} from "../src/ERC20.sol";
 import {StdInvariant} from "forge-std/StdInvariant.sol";
-import {Vaulthandler} from "./handler.t.sol";
 
 contract VaultTest1 is Test {
     // vault1 initialisation
@@ -15,9 +14,6 @@ contract VaultTest1 is Test {
 
     //underlying token
     FourbToken token;
-
-    // invariant test handler
-    Vaulthandler handler;
 
     // Depositiors Address
     address firstUser = makeAddr("FIRSTUSER");
@@ -27,9 +23,6 @@ contract VaultTest1 is Test {
         vault1 = new Vault(address(token), 40e6);
         // initialising underlying token
         token = new FourbToken("FBTKN", "BBBBTKN", 6, 10);
-        // initialising vault in use
-        handler = new Vaulthandler(vault1);
-        targetContract(address(handler));
 
         // minting some tokens to the vault to prevent vault inflation attacks
         vm.prank(0x2e234DAe75C793f67A35089C9d99245E1C58470b);
@@ -155,18 +148,5 @@ contract VaultTest1 is Test {
         console2.log("total shares:", vault1.getTotalSupply());
 
         vm.stopPrank();
-    }
-
-    function invariant_UserMustNotBeCreditedMoreThanApproved() public view {
-        console2.log("Total supply before: ", handler.balbefore());
-        console2.log("Total supply after: ", handler.balafter());
-
-        assertGt(handler.balafter(), handler.balbefore());
-        assertGt(handler.totalSupplyfuzz(), handler.totalSupplyfuzzPrev());
-        assertEq(handler.balafter(), 50e6);
-    }
-
-    function invariant_totalsupplymustincrease() public view {
-        assertGt(handler.totSupp(), handler.totSuppPrev());
     }
 }

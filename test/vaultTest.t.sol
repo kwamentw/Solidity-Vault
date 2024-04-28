@@ -6,6 +6,7 @@ import {Test, console2} from "forge-std/Test.sol";
 // import {Vault2} from "../src/Vault.sol";
 import {Vault2} from "../src/Vault.sol";
 import {FourbToken} from "../src/ERC20.sol";
+import {StdInvariant} from "forge-std/StdInvariant.sol";
 
 /**
  * @title Vaut2 Test
@@ -182,5 +183,9 @@ contract VaultTest is Test {
         // Total tokens supply & vault balance after the second withdrawal
         console2.log("Total token supply is: ", token.totalSupply());
         console2.log(" vault balance is: ", vault.totalSupply());
+    }
+
+    function test_totalSupplyGtTotalVaultTokens() public view {
+        assertGt(token.totalSupply(), vault.totalSupply());
     }
 }
