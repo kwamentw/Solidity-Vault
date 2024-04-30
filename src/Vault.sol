@@ -176,6 +176,10 @@ contract Vault2 {
         totalSupply += _initialdeposit;
     }
 
+    function getAsset() public view returns (IERC20) {
+        return token;
+    }
+
     function _mint(address _to, uint256 _shares) private {
         totalSupply += _shares;
         balanceOf[_to] += _shares;

@@ -185,7 +185,25 @@ contract VaultTest is Test {
         console2.log(" vault balance is: ", vault.totalSupply());
     }
 
-    function test_totalSupplyGtTotalVaultTokens() public view {
-        assertGt(token.totalSupply(), vault.totalSupply());
+    function invariant_alwaysDepositable() public payable {
+        vm.startPrank(msg.sender);
+        token.mint(13e8);
+        token.approve(12e8, address(vault));
+        vault.deposit(12e8);
+        vm.stopPrank();
+        assertGt(vault.balanceOf(msg.sender), 0);
+    }
+
+    function invariant_alwayswithdrawable() public {
+        test_vaultDeposit();
+        uint256 amount;
+
+        amount = bound(amount, 1, 100e8);
+        vm.startPrank(userTwo);
+        vault.withdraw(amount);
+        vm.stopPrank();
+
+        assertEq(vault.balanceOf(userTwo), 75e8 - amount);
+        assertGt(token.balanceOf(userTwo), 0);
     }
 }
